@@ -4,6 +4,7 @@ import { useMemoStore } from "@/stores/memo";
 
 const store = useMemoStore();
 const newMemo = ref("");
+const draggingIndex = ref<number | null>(null);
 
 const add = () => {
   if (newMemo.value.trim()) {
@@ -11,11 +12,38 @@ const add = () => {
     newMemo.value = "";
   }
 };
+
+const onDragStart = (index: number) => {
+  draggingIndex.value = index;
+};
+
+const onDragOver = (event: DragEvent, index: number) => {
+  event.preventDefault();
+  if (draggingIndex.value === null) {
+    return;
+  }
+
+  const overIndex = index;
+  if (draggingIndex.value === overIndex) {
+    return;
+  }
+
+  const newMemos = [...store.memos];
+  const [removed] = newMemos.splice(draggingIndex.value, 1);
+  newMemos.splice(overIndex, 0, removed);
+
+  store.memos = newMemos;
+  draggingIndex.value = overIndex;
+};
+
+const onDragEnd = () => {
+  draggingIndex.value = null;
+};
 </script>
 
 <template>
   <div class="p-4 max-w-md mx-auto">
-    <h1 class="text-xl font-bold">メモ帳</h1>
+    <h1 class="text-xl font-bold text-gray-600">メモ帳</h1>
     <input
       v-model="newMemo"
       @keyup.enter="add"
@@ -28,9 +56,16 @@ const add = () => {
         v-for="(memo, index) in store.memos"
         :key="index"
         class="bg-gray-100 p-2 rounded flex justify-between"
+        draggable="true"
+        @dragstart="onDragStart(index)"
+        @dragover="onDragOver($event, index)"
+        @dragend="onDragEnd"
       >
         <span>{{ memo }}</span>
-        <button @click="store.deleteMemo(index)" class="text-red-400">
+        <button
+          @click="store.deleteMemo(index)"
+          class="text-red-400 cursor-pointer"
+        >
           削除
         </button>
       </li>
