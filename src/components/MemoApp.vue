@@ -39,6 +39,13 @@ const onDragOver = (event: DragEvent, index: number) => {
 const onDragEnd = () => {
   draggingIndex.value = null;
 };
+
+const edit = (index: number, text: string) => {
+  const newText = prompt("メモを編集", text);
+  if (newText?.trim()) {
+    store.editMemo(index, newText.trim());
+  }
+};
 </script>
 
 <template>
@@ -62,12 +69,20 @@ const onDragEnd = () => {
         @dragend="onDragEnd"
       >
         <span>{{ memo }}</span>
-        <button
-          @click="store.deleteMemo(index)"
-          class="text-red-400 cursor-pointer"
-        >
-          削除
-        </button>
+        <div>
+          <button
+            @click="edit(index, memo)"
+            class="text-blue-400 cursor-pointer mr-2"
+          >
+            編集
+          </button>
+          <button
+            @click="store.deleteMemo(index)"
+            class="text-red-400 cursor-pointer"
+          >
+            削除
+          </button>
+        </div>
       </li>
     </ul>
   </div>
