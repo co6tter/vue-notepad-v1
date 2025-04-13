@@ -68,10 +68,19 @@ const edit = (index: number, text: string) => {
         @dragover="onDragOver($event, index)"
         @dragend="onDragEnd"
       >
-        <span>{{ memo }}</span>
+        <div class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            :checked="memo.completed"
+            @change="store.toggleMemoCompletion(index)"
+          />
+          <span :class="{ 'line-through': memo.completed }">{{
+            memo.text
+          }}</span>
+        </div>
         <div>
           <button
-            @click="edit(index, memo)"
+            @click="edit(index, memo.text)"
             class="text-blue-400 cursor-pointer mr-2"
           >
             編集
