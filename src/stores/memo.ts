@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 interface Memo {
   text: string;
   completed: boolean;
+  category: string;
 }
 
 export const useMemoStore = defineStore("memo", {
@@ -14,8 +15,8 @@ export const useMemoStore = defineStore("memo", {
     memoCount: (state) => state.memos.length,
   },
   actions: {
-    addMemo(text: string) {
-      this.memos.push({ text, completed: false });
+    addMemo(text: string, category: string) {
+      this.memos.push({ text, completed: false, category });
     },
     editMemo(index: number, newText: string) {
       if (index >= 0 && index < this.memos.length) {
