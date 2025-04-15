@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useMemoStore } from "@/stores/memo";
+import { useCategoryStore } from "@/stores/category";
 
 const store = useMemoStore();
+const categoryStore = useCategoryStore();
 const newMemo = ref("");
+const selectedCategory = ref(categoryStore.categories[0]);
 const draggingIndex = ref<number | null>(null);
 
 const add = () => {
   if (newMemo.value.trim()) {
-    store.addMemo(newMemo.value.trim());
+    store.addMemo(newMemo.value.trim(), selectedCategory.value);
     newMemo.value = "";
   }
 };
@@ -57,7 +60,23 @@ const edit = (index: number, text: string) => {
       class="w-full mt-2 p-2 border rounded"
       placeholder="メモを入力"
     />
-    <p class="mt-2 text-sm text-gray-400">メモ数: {{ store.memoCount }}</p>
+    <div class="flex flex-col">
+      <label for="category" class="mt-2 text-gray-600">カテゴリ</label>
+      <select
+        id="category"
+        v-model="selectedCategory"
+        class="p-2 border rounded"
+      >
+        <option
+          v-for="category in categoryStore.categories"
+          :key="category"
+          :value="category"
+        >
+          {{ category }}
+        </option>
+      </select>
+    </div>
+    <p class="mt-8 text-sm text-gray-400">メモ数: {{ store.memoCount }}</p>
     <ul class="flex flex-col gap-2 mt-2">
       <li
         v-for="(memo, index) in store.memos"
@@ -77,6 +96,10 @@ const edit = (index: number, text: string) => {
           <span :class="{ 'line-through': memo.completed }">{{
             memo.text
           }}</span>
+          <span
+            class="text-sm text-gray-400 border border-gray-400 rounded px-1"
+            >{{ memo.category }}</span
+          >
         </div>
         <div>
           <button
