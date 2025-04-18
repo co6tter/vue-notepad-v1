@@ -7,11 +7,27 @@ const store = useMemoStore();
 const categoryStore = useCategoryStore();
 const newMemo = ref("");
 const selectedCategory = ref(categoryStore.categories[0]);
+const priority = ref("medium");
 const draggingIndex = ref<number | null>(null);
+
+const priorityIcons = {
+  high: "🔴",
+  medium: "🟡",
+  low: "🔵",
+};
+
+const isPriority = (
+  priority: string
+): priority is "high" | "medium" | "low" => {
+  return ["high", "medium", "low"].includes(priority);
+};
+
+const getPriorityIcon = (priority: "high" | "medium" | "low") =>
+  priorityIcons[priority] || "";
 
 const add = () => {
   if (newMemo.value.trim()) {
-    store.addMemo(newMemo.value.trim(), selectedCategory.value);
+    store.addMemo(newMemo.value.trim(), selectedCategory.value, priority.value);
     newMemo.value = "";
   }
 };
@@ -76,6 +92,14 @@ const edit = (index: number, text: string) => {
         </option>
       </select>
     </div>
+    <div class="flex flex-col">
+      <label for="priority" class="mt-2 text-gray-600">優先度</label>
+      <select id="priority" v-model="priority" class="p-2 border rounded">
+        <option value="low">低</option>
+        <option value="medium">中</option>
+        <option value="high">高</option>
+      </select>
+    </div>
     <p class="mt-8 text-sm text-gray-400">メモ数: {{ store.memoCount }}</p>
     <ul class="flex flex-col gap-2 mt-2">
       <li
@@ -100,6 +124,9 @@ const edit = (index: number, text: string) => {
             class="text-sm text-gray-400 border border-gray-400 rounded px-1"
             >{{ memo.category }}</span
           >
+          <span v-if="isPriority(memo.priority)">{{
+            getPriorityIcon(memo.priority)
+          }}</span>
         </div>
         <div>
           <button
