@@ -5,6 +5,7 @@ interface Memo {
   text: string;
   completed: boolean;
   category: string;
+  priority: string;
 }
 
 export const useMemoStore = defineStore("memo", {
@@ -15,8 +16,8 @@ export const useMemoStore = defineStore("memo", {
     memoCount: (state) => state.memos.length,
   },
   actions: {
-    addMemo(text: string, category: string) {
-      this.memos.push({ text, completed: false, category });
+    addMemo(text: string, category: string, priority: string) {
+      this.memos.push({ text, completed: false, category, priority });
     },
     editMemo(index: number, newText: string) {
       if (index >= 0 && index < this.memos.length) {
