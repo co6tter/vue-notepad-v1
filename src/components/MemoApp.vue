@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useMemoStore } from "@/stores/memo";
 import { useCategoryStore } from "@/stores/category";
 
@@ -9,6 +9,7 @@ const newMemo = ref("");
 const selectedCategory = ref(categoryStore.categories[0]);
 const priority = ref("medium");
 const draggingIndex = ref<number | null>(null);
+const searchQuery = ref("");
 
 const priorityIcons = {
   high: "🔴",
@@ -24,6 +25,15 @@ const isPriority = (
 
 const getPriorityIcon = (priority: "high" | "medium" | "low") =>
   priorityIcons[priority] || "";
+
+const filteredMemos = computed(() => {
+  if (!searchQuery.value) {
+    return store.memos;
+  }
+  return store.memos.filter((memo) =>
+    memo.text.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 
 const add = () => {
   if (newMemo.value.trim()) {
@@ -100,10 +110,15 @@ const edit = (index: number, text: string) => {
         <option value="high">高</option>
       </select>
     </div>
-    <p class="mt-8 text-sm text-gray-400">メモ数: {{ store.memoCount }}</p>
+    <input
+      v-model="searchQuery"
+      class="w-full mt-8 p-2 border rounded"
+      placeholder="メモを検索"
+    />
+    <p class="mt-2 text-sm text-gray-400">メモ数: {{ store.memoCount }}</p>
     <ul class="flex flex-col gap-2 mt-2">
       <li
-        v-for="(memo, index) in store.memos"
+        v-for="(memo, index) in filteredMemos"
         :key="index"
         class="bg-gray-100 p-2 rounded flex justify-between"
         draggable="true"
