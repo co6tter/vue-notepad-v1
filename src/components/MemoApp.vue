@@ -11,6 +11,7 @@ const selectedCategory = ref(categoryStore.categories[0]);
 const priority = ref("medium");
 const draggingIndex = ref<number | null>(null);
 const searchQuery = ref("");
+const showArchived = ref(false);
 
 const { width } = useWindowSize();
 
@@ -77,6 +78,10 @@ const edit = (index: number, text: string) => {
   if (newText?.trim()) {
     store.editMemo(index, newText.trim());
   }
+};
+
+const toggleShowArchived = () => {
+  showArchived.value = !showArchived.value;
 };
 </script>
 
@@ -157,11 +162,41 @@ const edit = (index: number, text: string) => {
             編集
           </button>
           <button
+            @click="store.archiveMemo(index)"
+            class="text-yellow-400 cursor-pointer mr-2"
+          >
+            アーカイブ
+          </button>
+          <button
             @click="store.deleteMemo(index)"
             class="text-red-400 cursor-pointer"
           >
             削除
           </button>
+        </div>
+      </li>
+    </ul>
+    <button @click="toggleShowArchived" class="mt-4 p-2 bg-gray-200 rounded">
+      {{ showArchived ? "アーカイブを非表示" : "アーカイブを表示" }}
+    </button>
+    <ul v-if="showArchived" class="flex flex-col gap-2 mt-2">
+      <li
+        v-for="(memo, index) in store.archivedMemos"
+        :key="index"
+        class="bg-gray-200 p-2 rounded flex justify-between"
+      >
+        <div class="flex items-center gap-2">
+          <span :class="{ 'line-through': memo.completed }">{{
+            memo.text
+          }}</span>
+          <span
+            v-if="width >= 448"
+            class="text-sm text-gray-400 border border-gray-400 rounded px-1"
+            >{{ memo.category }}</span
+          >
+          <span v-if="isPriority(memo.priority) && width >= 448">{{
+            getPriorityIcon(memo.priority)
+          }}</span>
         </div>
       </li>
     </ul>
