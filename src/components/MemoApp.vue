@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useMemoStore } from "@/stores/memo";
 import { useCategoryStore } from "@/stores/category";
+import { useWindowSize } from "@vueuse/core";
 
 const store = useMemoStore();
 const categoryStore = useCategoryStore();
@@ -10,6 +11,8 @@ const selectedCategory = ref(categoryStore.categories[0]);
 const priority = ref("medium");
 const draggingIndex = ref<number | null>(null);
 const searchQuery = ref("");
+
+const { width } = useWindowSize();
 
 const priorityIcons = {
   high: "🔴",
@@ -78,7 +81,7 @@ const edit = (index: number, text: string) => {
 </script>
 
 <template>
-  <div class="p-4 max-w-md mx-auto">
+  <div class="p-4 mx-auto max-w-md">
     <h1 class="text-xl font-bold text-gray-600">メモ帳</h1>
     <input
       v-model="newMemo"
@@ -115,7 +118,9 @@ const edit = (index: number, text: string) => {
       class="w-full mt-8 p-2 border rounded"
       placeholder="メモを検索"
     />
-    <p class="mt-2 text-sm text-gray-400">メモ数: {{ store.memoCount }}</p>
+    <p class="mt-2 text-sm text-gray-400">
+      メモ数: {{ filteredMemos.length ?? 0 }}
+    </p>
     <ul class="flex flex-col gap-2 mt-2">
       <li
         v-for="(memo, index) in filteredMemos"
@@ -136,10 +141,11 @@ const edit = (index: number, text: string) => {
             memo.text
           }}</span>
           <span
+            v-if="width >= 448"
             class="text-sm text-gray-400 border border-gray-400 rounded px-1"
             >{{ memo.category }}</span
           >
-          <span v-if="isPriority(memo.priority)">{{
+          <span v-if="isPriority(memo.priority) && width >= 448">{{
             getPriorityIcon(memo.priority)
           }}</span>
         </div>
