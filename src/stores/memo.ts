@@ -11,6 +11,7 @@ interface Memo {
 export const useMemoStore = defineStore("memo", {
   state: () => ({
     memos: useLocalStorage<Memo[]>("memos", []),
+    archivedMemos: useLocalStorage<Memo[]>("archivedMemos", []),
   }),
   getters: {
     memoCount: (state) => state.memos.length,
@@ -30,6 +31,12 @@ export const useMemoStore = defineStore("memo", {
     toggleMemoCompletion(index: number) {
       if (index >= 0 && index < this.memos.length) {
         this.memos[index].completed = !this.memos[index].completed;
+      }
+    },
+    archiveMemo(index: number) {
+      if (index >= 0 && index < this.memos.length) {
+        const [archivedMemo] = this.memos.splice(index, 1);
+        this.archivedMemos.push(archivedMemo);
       }
     },
   },
